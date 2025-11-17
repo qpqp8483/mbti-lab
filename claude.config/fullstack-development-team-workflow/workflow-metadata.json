@@ -1,0 +1,99 @@
+{
+  "name": "Fullstack Development Team Workflow",
+  "commandName": "fullstack-development-team-workflow",
+  "description": "A workflow for a fullstack development team using Next.js, React, TypeScript, Tailwind CSS, Supabase, and ESLint with a code reviewer included.",
+  "version": "6.4",
+  "created": "2023-11-03T14:25:00Z",
+  "updated": "2025-11-17T00:02:50.215Z",
+  "orchestrator": {
+    "id": "orchestrator",
+    "displayName": "Orchestrator"
+  },
+  "agents": [
+    {
+      "id": "orchestrator",
+      "displayName": "Orchestrator",
+      "description": "Coordinates the fullstack development workflow",
+      "role": "orchestrator",
+      "model": "sonnet",
+      "tools": [
+        "Task",
+        "Write",
+        "Read"
+      ]
+    },
+    {
+      "id": "requirements-analyzer",
+      "displayName": "Requirements Analyzer",
+      "description": "Analyzes the project requirements",
+      "role": "specialist",
+      "model": "sonnet",
+      "tools": [
+        "Read",
+        "Write",
+        "Grep",
+        "Glob"
+      ]
+    },
+    {
+      "id": "frontend-implementer",
+      "displayName": "Frontend Implementer",
+      "description": "Implements the frontend using Next.js and React",
+      "role": "specialist",
+      "model": "sonnet",
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Grep",
+        "Glob"
+      ]
+    },
+    {
+      "id": "backend-implementer",
+      "displayName": "Backend Implementer",
+      "description": "Implements the backend using Supabase",
+      "role": "specialist",
+      "model": "sonnet",
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Grep",
+        "Glob"
+      ]
+    },
+    {
+      "id": "code-reviewer",
+      "displayName": "Code Reviewer",
+      "description": "Reviews code and makes approval decisions",
+      "role": "specialist",
+      "model": "sonnet",
+      "tools": [
+        "Read",
+        "Write",
+        "Bash"
+      ]
+    },
+    {
+      "id": "quality-validator",
+      "displayName": "Quality Validator",
+      "description": "Validates code quality and adherence to standards",
+      "role": "specialist",
+      "model": "haiku",
+      "tools": [
+        "Read",
+        "Bash",
+        "Grep"
+      ]
+    }
+  ],
+  "nodeCount": {
+    "total": 7,
+    "agents": 6,
+    "documents": 1
+  },
+  "features": {
+    "documentReferences": true
+  }
+}

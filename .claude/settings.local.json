@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude.config/fullstack-development-team-workflow/docs/workflow-execution.log)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Header UI를 모던한 스타일로 개선 및 프로젝트 초기 설정 완료\n\n- Header 컴포넌트를 요즘 트렌드에 맞는 깔끔한 UI로 리디자인\n  - 그라디언트 로고 아이콘 및 브랜드 아이덴티티 강화\n  - Active 링크에 그라디언트 언더라인 인디케이터 추가\n  - 글래스모피즘 효과 (backdrop-blur, 투명도 조정)\n  - CTA 스타일 Login 버튼, 심플한 Logout 링크\n  - 반응형 레이아웃 및 부드러운 transition 효과\n\n- 프로젝트 문서 및 워크플로우 설정 추가\n  - CLAUDE.md, DEVELOPMENT.md, QUICKSTART.md 추가\n  - Fullstack Development Team Workflow 설정\n  - Husky pre-commit 훅 추가 (lint + type check)\n\n- 애플리케이션 기능 구현\n  - Supabase 인증 통합 (로그인, 회원가입, 로그아웃)\n  - 테스트 목록, 마이페이지, 인증 스모크 테스트 페이지\n  - TypeScript 타입 정의 추가\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
