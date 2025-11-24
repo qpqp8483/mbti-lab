@@ -1,152 +1,79 @@
-# Fullstack Development Team Workflow
+# MBTI Lab
 
-## 🚀 Quick Start (3 steps)
+MBTI 성격 유형 테스트를 제공하는 웹 애플리케이션입니다.
 
-1. **압축 해제**
+## 기술 스택
 
-   ```bash
-   unzip fullstack-development-team-workflow-workflow.zip
-   cd fullstack-development-team-workflow
-   ```
+- **Frontend**: Next.js 16, React 19, TypeScript
+- **Styling**: Tailwind CSS 4
+- **Backend**: Supabase (Authentication, Database)
+- **Tooling**: ESLint, Husky
 
-2. **초기화 스크립트 실행** (선택사항)
+## 시작하기
 
-   ```bash
-   chmod +x install.sh
-   ./install.sh
-   ```
-
-3. **Claude Code에서 실행**
-
-   Claude Code를 열고 다음과 같이 실행하세요:
-
-   ```bash
-   /fullstack-development-team-workflow "작업 설명"
-   ```
-
-## 💡 사용 방법 및 예제
-
-### 기본 사용법
-
-Claude Code CLI에서 슬래시 커맨드로 워크플로우를 실행합니다:
+### 설치 및 실행
 
 ```bash
-/fullstack-development-team-workflow "여기에 원하는 작업을 자세히 설명하세요"
+# 의존성 설치
+npm install
+
+# 개발 서버 실행 (포트 3001)
+npm run dev
+
+# 프로덕션 빌드
+npm run build
+
+# 프로덕션 서버 실행
+npm start
 ```
 
-### 📝 실제 사용 예제
+## 주요 기능
 
-**예제 1: 간단한 요청**
+- 사용자 인증 (회원가입, 로그인, 로그아웃)
+- MBTI 테스트 진행
+- 테스트 결과 확인
+- 마이페이지
+
+## 개발 명령어
 
 ```bash
-/fullstack-development-team-workflow "사용자 로그인 기능을 구현해주세요"
+# 린트 검사 (경고 0개 강제)
+npm run lint
+
+# 린트 자동 수정
+npm run lint:fix
+
+# 타입 체크
+npm run type
+
+# 린트 + 타입 체크
+npm run check
+
+# Supabase 타입 생성
+npm run types:gen
 ```
 
-**예제 2: 상세한 요청**
-
-```bash
-/fullstack-development-team-workflow "이메일과 비밀번호로 로그인하는 API를 만들어주세요. JWT 토큰을 발급하고, 비밀번호는 bcrypt로 해싱해야 합니다."
-```
-
-**예제 3: 복잡한 작업**
-
-```bash
-/fullstack-development-team-workflow "쇼핑몰 장바구니 기능 전체를 구현해주세요. 상품 추가, 삭제, 수량 변경, 총 금액 계산이 필요합니다."
-```
-
-### 🎯 효과적인 요청 작성 팁
-
-1. **구체적으로 작성하세요**
-
-   - ❌ "회원가입 만들어줘"
-   - ✅ "이메일 중복 체크를 포함한 회원가입 API와 프론트엔드 폼을 만들어주세요"
-
-2. **필요한 기술 스택을 명시하세요**
-
-   - "React와 TypeScript로 대시보드를 만들어주세요"
-   - "PostgreSQL을 사용하는 REST API를 구현해주세요"
-
-3. **제약사항이 있다면 함께 알려주세요**
-   - "모바일에서도 잘 보이도록 반응형으로 만들어주세요"
-   - "페이지네이션은 커서 기반으로 구현해주세요"
-
-### 🔄 실행 흐름
-
-1. **명령어 입력**: Claude Code에서 `/fullstack-development-team-workflow` 실행
-2. **작업 분석**: 오케스트레이터가 요청 분석
-3. **에이전트 실행**: 필요한 에이전트들이 순차/병렬로 작업 수행
-4. **결과 확인**: 생성된 코드와 파일 확인
-
-### 📊 진행 상황 모니터링
-
-실행 중 로그를 확인하려면:
-
-```bash
-# 실시간 로그 확인
-tail -f claude.config/fullstack-development-team-workflow/docs/workflow-execution.log
-
-# 전체 로그 보기
-cat claude.config/fullstack-development-team-workflow/docs/workflow-execution.log
-```
-
-## 📋 포함된 에이전트 (6개)
-
-- **@orchestrator** 🎯 **Orchestrator**: Coordinates the fullstack development workflow
-- **@requirements-analyzer** : Analyzes the project requirements
-- **@frontend-implementer** : Implements the frontend using Next.js and React
-- **@backend-implementer** : Implements the backend using Supabase
-- **@code-reviewer** : Reviews code and makes approval decisions
-- **@quality-validator** : Validates code quality and adherence to standards
-
-## 📁 프로젝트 구조
+## 프로젝트 구조
 
 ```
-fullstack-development-team-workflow/
-├── README.md (이 파일)
-├── QUICKSTART.md
-├── install.sh
-├── .claude/
-│   ├── commands/fullstack-development-team-workflow.md
-│   ├── agents/
-│   └── CLAUDE.md
-└── claude.config/
-    ├── docs/
-    │   ├── ORCHESTRATOR.md
-    │   ├── ARCHITECTURE.md
-    │   ├── USAGE.md
-    │   └── workflow-execution.log
-    ├── devcontainer/ (선택적)
-    ├── scripts/
-    └── workflow-metadata.json
+src/
+├── app/
+│   ├── components/      # 공유 컴포넌트
+│   ├── lib/            # 유틸리티 및 클라이언트 설정
+│   ├── login/          # 로그인/회원가입 페이지
+│   ├── mypage/         # 마이페이지
+│   ├── tests/          # MBTI 테스트 관련 페이지
+│   └── layout.tsx      # 전역 레이아웃
+├── types/              # TypeScript 타입 정의
+└── styles/             # 전역 스타일
 ```
 
-## 📚 자세한 문서
+## 코드 품질
 
-- **[QUICKSTART.md](./QUICKSTART.md)**: 빠른 시작 가이드
-- **[ORCHESTRATOR.md](claude.config/fullstack-development-team-workflow/docs/ORCHESTRATOR.md)**: 오케스트레이터 설명
-- **[USAGE.md](claude.config/fullstack-development-team-workflow/docs/USAGE.md)**: 사용법 가이드
-- **[ARCHITECTURE.md](claude.config/fullstack-development-team-workflow/docs/ARCHITECTURE.md)**: 아키텍처 문서
+이 프로젝트는 다음을 사용하여 코드 품질을 유지합니다:
 
-## ⚙️ 요구사항
+- **ESLint**: 코드 스타일 및 잠재적 오류 검사
+- **TypeScript**: 정적 타입 검사
+- **Husky**: pre-commit 훅으로 커밋 전 자동 검사
 
-- Claude Code CLI
-- Node.js 18+ (선택사항, devcontainer 사용 시)
-
-## 🐛 문제 해결
-
-문제가 발생하면 다음을 확인하세요:
-
-1. Claude Code가 올바르게 설치되었는지 확인
-2. `.claude` 디렉토리가 올바른 위치에 있는지 확인
-3. `./validate.sh`를 실행하여 구조 검증
-
-## 📝 라이선스
-
-이 워크플로우는 ./claude로 생성되었습니다.
-
----
-
-**생성 정보**
-
-- 워크플로우 버전: 6.4
-- 생성 일시: 2023. 11. 3. 오후 11:25:00
+커밋 시 자동으로 `npm run check` (lint + type check)가 실행되며, 오류가 있으면 커밋이 차단됩니다.
