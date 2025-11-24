@@ -18,13 +18,20 @@ export default function Header() {
     // 초기 사용자 세션 확인
     client.auth
       .getUser()
-      .then(({ data }) => setUser(data.user ?? null))
-      .catch(() => setUser(null));
+      .then(({ data }) => {
+        console.log('[Header] User data:', data.user);
+        setUser(data.user ?? null);
+      })
+      .catch((error) => {
+        console.error('[Header] Error getting user:', error);
+        setUser(null);
+      });
 
     // 로그인/로그아웃 상태 변화 구독
     const {
       data: { subscription },
-    } = client.auth.onAuthStateChange((_event, session) => {
+    } = client.auth.onAuthStateChange((event, session) => {
+      console.log('[Header] Auth state changed:', event, session?.user);
       setUser(session?.user ?? null);
     });
 
@@ -74,10 +81,6 @@ export default function Header() {
 
           {/* Navigation */}
           <nav className="flex items-center gap-1">
-            <Link href="/tests" className={linkClass('/tests')}>
-              Tests
-              {activeIndicator('/tests')}
-            </Link>
             {user ? (
               <>
                 <Link href="/mypage" className={linkClass('/mypage')}>
