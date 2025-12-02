@@ -14,6 +14,14 @@ interface ScoreBreakdown {
   right: { label: string; score: number; percentage: number };
 }
 
+interface ScoreItem {
+  code: string;
+  title: string;
+  score: number;
+  percentage: number;
+  isResult: boolean;
+}
+
 export default function Result({
   params,
   searchParams,
@@ -26,6 +34,7 @@ export default function Result({
   const [result, setResult] = useState<ResultRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [scoreBreakdown, setScoreBreakdown] = useState<ScoreBreakdown[]>([]);
+  const [scoreItems, setScoreItems] = useState<ScoreItem[]>([]);
 
   const calculateScoreBreakdown = (
     scores: Record<string, number>,
@@ -99,8 +108,16 @@ export default function Result({
       }
       setResult(res);
 
+      // 모든 결과 가져오기 (그래프 표시용)
+      const { data: allResults } = await supabase()
+        .from('results')
+        .select('code, title')
+        .eq('test_id', test.id);
+
       // 가장 최근 submission 가져와서 점수 계산
       const { data: user } = await supabase().auth.getUser();
+      let scores: Record<string, number> = {};
+
       if (user.user) {
         const { data: submissions } = await supabase()
           .from('submissions')
@@ -113,13 +130,37 @@ export default function Result({
           .returns<Pick<SubmissionRow, 'scores_json'>[]>();
 
         if (submissions && submissions.length > 0) {
-          const scores = (submissions[0].scores_json ?? {}) as Record<
-            string,
-            number
-          >;
-          const breakdown = calculateScoreBreakdown(scores);
-          setScoreBreakdown(breakdown);
+          scores = (submissions[0].scores_json ?? {}) as Record<string, number>;
         }
+      }
+
+      // MBTI 차원이 있는지 확인
+      const mbtiDimensions = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P'];
+      const isMbtiTest = mbtiDimensions.some((dim) => scores[dim] !== undefined);
+
+      if (isMbtiTest) {
+        // MBTI 테스트 (커피, classic-mbti 등): 차원 그래프
+        const breakdown = calculateScoreBreakdown(scores);
+        setScoreBreakdown(breakdown);
+      } else if (allResults) {
+        // 다른 테스트: 결과별 점수 그래프
+        const hasScores = Object.keys(scores).length > 0;
+        const totalScore = hasScores
+          ? Object.values(scores).reduce((sum, s) => sum + s, 0) || 1
+          : allResults.length;
+
+        const items: ScoreItem[] = allResults
+          .map((r) => ({
+            code: r.code,
+            title: r.title,
+            score: scores[r.code] || 0,
+            percentage: hasScores
+              ? Math.round(((scores[r.code] || 0) / totalScore) * 100)
+              : r.code === code ? 100 : 0,
+            isResult: r.code === code,
+          }))
+          .sort((a, b) => b.score - a.score);
+        setScoreItems(items);
       }
 
       setLoading(false);
@@ -247,8 +288,8 @@ export default function Result({
           <div className="p-8">
             {/* Image */}
             {result.image_url && (
-              <div className="mb-8 flex justify-center">
-                <div className="relative h-64 w-64 overflow-hidden rounded-2xl">
+              <div className="mb-8">
+                <div className="relative w-full aspect-square max-w-2xl mx-auto overflow-hidden rounded-2xl">
                   <Image
                     src={result.image_url}
                     alt={result.code ?? 'result'}
@@ -259,55 +300,102 @@ export default function Result({
               </div>
             )}
 
-            {/* Score Breakdown */}
-            {scoreBreakdown.length > 0 && (
+            {/* Score Distribution - 모든 테스트 통일 */}
+            {scoreItems.length > 0 && (
               <div className="mb-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
                 <h3 className="mb-4 text-center text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                  결과별 점수 분포
+                </h3>
+                <div className="space-y-3">
+                  {scoreItems.map((item) => (
+                    <div key={item.code}>
+                      <div className="mb-1 flex items-center justify-between text-sm">
+                        <span className={`font-medium ${
+                          item.isResult
+                            ? 'text-indigo-600 dark:text-indigo-400'
+                            : 'text-zinc-600 dark:text-zinc-400'
+                        }`}>
+                          {item.title}
+                          {item.isResult && ' ✓'}
+                        </span>
+                        <span className="text-xs text-zinc-500">
+                          {item.score}점 ({item.percentage}%)
+                        </span>
+                      </div>
+                      <div className="h-6 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                        <div
+                          className={`h-full transition-all duration-500 ${
+                            item.isResult
+                              ? 'bg-gradient-to-r from-indigo-500 to-fuchsia-600'
+                              : 'bg-gradient-to-r from-zinc-400 to-zinc-500'
+                          }`}
+                          style={{ width: `${item.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-center text-xs text-zinc-500 dark:text-zinc-600">
+                  가장 높은 점수를 받은 결과가 최종 유형입니다
+                </p>
+              </div>
+            )}
+
+            {/* MBTI 차원 그래프 (커피, classic-mbti 등) */}
+            {scoreBreakdown.length > 0 && (
+              <div className="mb-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+                <h3 className="mb-4 text-center text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
                   성격 차원별 점수
                 </h3>
-                <div className="space-y-6">
+                <div className="space-y-5 sm:space-y-6">
                   {scoreBreakdown.map((item, idx) => (
                     <div key={idx}>
-                      <div className="mb-2 flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400">
-                        <span className="font-medium">{item.dimension}</span>
+                      {/* 차원 이름 - 모바일에서는 축약형 */}
+                      <div className="mb-2 text-center">
+                        <span className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 sm:hidden">
+                          {item.dimension.split(' vs ')[0].slice(0, 2)} vs {item.dimension.split(' vs ')[1].slice(0, 2)}
+                        </span>
+                        <span className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                          {item.dimension}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {/* Left side */}
-                        <div className="flex w-16 flex-col items-end">
-                          <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
+                      <div className="flex items-center gap-2 px-2 sm:gap-3 sm:px-0">
+                        {/* Left side - 모바일 최적화 */}
+                        <div className="flex w-10 sm:w-16 flex-col items-end">
+                          <span className="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400">
                             {item.left.label}
                           </span>
-                          <span className="text-xs text-zinc-500">
+                          <span className="text-[10px] sm:text-xs text-zinc-500">
                             {item.left.percentage}%
                           </span>
                         </div>
 
-                        {/* Progress bar */}
+                        {/* Progress bar - 모바일에서 높이 증가 */}
                         <div className="relative flex-1">
-                          <div className="h-8 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                          <div className="h-10 sm:h-8 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                             <div className="flex h-full">
                               {/* Left bar */}
                               <div
-                                className="flex items-center justify-end bg-gradient-to-r from-indigo-500 to-indigo-600 px-2 transition-all duration-500"
+                                className="flex items-center justify-end bg-gradient-to-r from-indigo-500 to-indigo-600 px-1.5 sm:px-2 transition-all duration-500"
                                 style={{
                                   width: `${item.left.percentage}%`,
                                 }}
                               >
-                                {item.left.percentage > 15 && (
-                                  <span className="text-xs font-semibold text-white">
+                                {item.left.percentage > 10 && (
+                                  <span className="text-[10px] sm:text-xs font-semibold text-white">
                                     {item.left.score}
                                   </span>
                                 )}
                               </div>
                               {/* Right bar */}
                               <div
-                                className="flex items-center justify-start bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 px-2 transition-all duration-500"
+                                className="flex items-center justify-start bg-gradient-to-r from-fuchsia-600 to-fuchsia-500 px-1.5 sm:px-2 transition-all duration-500"
                                 style={{
                                   width: `${item.right.percentage}%`,
                                 }}
                               >
-                                {item.right.percentage > 15 && (
-                                  <span className="text-xs font-semibold text-white">
+                                {item.right.percentage > 10 && (
+                                  <span className="text-[10px] sm:text-xs font-semibold text-white">
                                     {item.right.score}
                                   </span>
                                 )}
@@ -316,12 +404,12 @@ export default function Result({
                           </div>
                         </div>
 
-                        {/* Right side */}
-                        <div className="flex w-16 flex-col items-start">
-                          <span className="text-lg font-bold text-fuchsia-600 dark:text-fuchsia-400">
+                        {/* Right side - 모바일 최적화 */}
+                        <div className="flex w-10 sm:w-16 flex-col items-start">
+                          <span className="text-base sm:text-lg font-bold text-fuchsia-600 dark:text-fuchsia-400">
                             {item.right.label}
                           </span>
-                          <span className="text-xs text-zinc-500">
+                          <span className="text-[10px] sm:text-xs text-zinc-500">
                             {item.right.percentage}%
                           </span>
                         </div>
@@ -329,7 +417,7 @@ export default function Result({
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-center text-xs text-zinc-500 dark:text-zinc-600">
+                <p className="mt-4 text-center text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-600 leading-relaxed">
                   각 차원별로 높은 점수를 받은 성향이 최종 MBTI 유형을 결정합니다
                 </p>
               </div>

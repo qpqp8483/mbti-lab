@@ -45,3 +45,6 @@ next-env.d.ts
 .mcp.json
 CLAUDE.md
 claude.config/
+
+# mbti test results
+.mbti_result

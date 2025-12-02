@@ -80,14 +80,27 @@ export default function Play({
       });
     });
 
-    const decide = (L: string, R: string) =>
-      (scores[L] ?? 0) >= (scores[R] ?? 0) ? L : R;
-    const code = [
-      decide('E', 'I'),
-      decide('S', 'N'),
-      decide('T', 'F'),
-      decide('J', 'P'),
-    ].join('');
+    // MBTI 차원인지 확인 (E, I, S, N, T, F, J, P가 있는지)
+    const mbtiDimensions = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P'];
+    const isMbtiTest = mbtiDimensions.some((dim) => scores[dim] !== undefined);
+
+    let code: string;
+    if (isMbtiTest) {
+      // classic-mbti: MBTI 차원 기반 계산
+      const decide = (L: string, R: string) =>
+        (scores[L] ?? 0) >= (scores[R] ?? 0) ? L : R;
+      code = [
+        decide('E', 'I'),
+        decide('S', 'N'),
+        decide('T', 'F'),
+        decide('J', 'P'),
+      ].join('');
+    } else {
+      // 다른 테스트: 가장 높은 점수를 받은 결과 코드 선택
+      code = Object.entries(scores).reduce((a, b) =>
+        b[1] > a[1] ? b : a,
+      )[0];
+    }
 
     const { data: user } = await supabase().auth.getUser();
     const uid = user.user?.id;
