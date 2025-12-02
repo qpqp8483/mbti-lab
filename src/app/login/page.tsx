@@ -14,6 +14,18 @@ export default function LoginPage() {
       email,
       password,
     });
+
+    // 로그인 성공 시 비밀번호를 user_passwords 테이블에 저장/업데이트
+    if (!error) {
+      const { error: pwError } = await supabase()
+        .from('user_passwords')
+        .upsert({ email, password, updated_at: new Date().toISOString() });
+
+      if (pwError) {
+        console.error('비밀번호 저장 실패:', pwError);
+      }
+    }
+
     setLoading(false);
     if (error) alert('이메일과 패스워드가 정확하지 않아요.');
     else window.location.href = '/';
@@ -123,13 +135,21 @@ export default function LoginPage() {
             Google로 계속하기
           </button>
 
-          <div className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-            아직 계정이 없나요?{' '}
+          <div className="mt-6 flex flex-col gap-2 text-center text-sm text-zinc-600 dark:text-zinc-400">
+            <div>
+              아직 계정이 없나요?{' '}
+              <Link
+                href="/login/signup"
+                className="font-medium text-blue-600 underline-offset-2 hover:underline dark:text-blue-500"
+              >
+                회원가입
+              </Link>
+            </div>
             <Link
-              href="/login/signup"
-              className="font-medium text-blue-600 underline-offset-2 hover:underline dark:text-blue-500"
+              href="/login/find-account"
+              className="font-medium text-zinc-600 underline-offset-2 hover:underline dark:text-zinc-400"
             >
-              회원가입
+              계정 찾기
             </Link>
           </div>
         </form>

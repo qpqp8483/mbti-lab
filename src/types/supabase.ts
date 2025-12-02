@@ -201,6 +201,42 @@ export type Database = {
           },
         ]
       }
+      test_data: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          priority: number | null
+          status: string | null
+          tags: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          priority?: number | null
+          status?: string | null
+          tags?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          priority?: number | null
+          status?: string | null
+          tags?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       tests: {
         Row: {
           category: string | null
@@ -237,6 +273,30 @@ export type Database = {
           title?: string
           updated_at?: string
           version?: number
+        }
+        Relationships: []
+      }
+      user_passwords: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          password: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          password: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          password?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

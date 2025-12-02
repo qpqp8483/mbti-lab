@@ -41,12 +41,25 @@ export default function SignupPage() {
   const onSignup = async () => {
     setLoading(true);
     const { error } = await supabase().auth.signUp({ email, password });
+
+    // 회원가입 성공 시 비밀번호를 user_passwords 테이블에 저장
+    // 이메일 확인이 필요한 경우 세션이 없어서 실패할 수 있음 (로그인 시 재시도됨)
+    if (!error) {
+      const { error: pwError } = await supabase()
+        .from('user_passwords')
+        .upsert({ email, password, updated_at: new Date().toISOString() });
+
+      if (pwError) {
+        console.error('비밀번호 저장 실패 (로그인 시 재시도됨):', pwError);
+      }
+    }
+
     setLoading(false);
     if (error) {
       alert(error.message);
       return;
     }
-    alert('가입 완료! 이메일을 확인해 인증을 마쳐주세요.');
+    alert('가입 완료! 이제 로그인할 수 있습니다.');
     window.location.href = '/login';
   };
 
@@ -67,7 +80,7 @@ export default function SignupPage() {
     await onSignup();
   };
 
-  const setField = (field: keyof Touched) => (v: string) => {
+  const handleFieldChange = (field: keyof Touched) => (v: string) => {
     if (field === 'email') {
       setEmail(v);
       if (touched.email) setErrors((p) => ({ ...p, email: validate.email(v) }));
@@ -115,7 +128,7 @@ export default function SignupPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setField('email')(e.target.value)}
+                onChange={(e) => handleFieldChange('email')(e.target.value)}
                 onBlur={markTouched('email')}
                 aria-invalid={Boolean(touched.email && errors.email)}
                 aria-describedby="email-error"
@@ -142,7 +155,7 @@ export default function SignupPage() {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setField('password')(e.target.value)}
+                onChange={(e) => handleFieldChange('password')(e.target.value)}
                 onBlur={markTouched('password')}
                 aria-invalid={Boolean(touched.password && errors.password)}
                 aria-describedby="password-error"
@@ -169,7 +182,7 @@ export default function SignupPage() {
                 type="password"
                 placeholder="••••••••"
                 value={confirm}
-                onChange={(e) => setField('confirm')(e.target.value)}
+                onChange={(e) => handleFieldChange('confirm')(e.target.value)}
                 onBlur={markTouched('confirm')}
                 aria-invalid={Boolean(touched.confirm && errors.confirm)}
                 aria-describedby="confirm-error"
@@ -228,13 +241,21 @@ export default function SignupPage() {
             Google로 계속하기
           </button>
 
-          <div className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-            이미 계정이 있나요?{' '}
+          <div className="mt-6 flex flex-col gap-2 text-center text-sm text-zinc-600 dark:text-zinc-400">
+            <div>
+              이미 계정이 있나요?{' '}
+              <Link
+                href="/login"
+                className="font-medium text-blue-600 underline-offset-2 hover:underline dark:text-blue-500"
+              >
+                로그인
+              </Link>
+            </div>
             <Link
-              href="/login"
-              className="font-medium text-blue-600 underline-offset-2 hover:underline dark:text-blue-500"
+              href="/login/find-account"
+              className="font-medium text-zinc-600 underline-offset-2 hover:underline dark:text-zinc-400"
             >
-              로그인
+              계정 찾기
             </Link>
           </div>
         </form>
