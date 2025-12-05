@@ -136,7 +136,9 @@ export default function Result({
 
       // MBTI 차원이 있는지 확인
       const mbtiDimensions = ['E', 'I', 'S', 'N', 'T', 'F', 'J', 'P'];
-      const isMbtiTest = mbtiDimensions.some((dim) => scores[dim] !== undefined);
+      const isMbtiTest = mbtiDimensions.some(
+        (dim) => scores[dim] !== undefined,
+      );
 
       if (isMbtiTest) {
         // MBTI 테스트 (커피, classic-mbti 등): 차원 그래프
@@ -156,7 +158,9 @@ export default function Result({
             score: scores[r.code] || 0,
             percentage: hasScores
               ? Math.round(((scores[r.code] || 0) / totalScore) * 100)
-              : r.code === code ? 100 : 0,
+              : r.code === code
+              ? 100
+              : 0,
             isResult: r.code === code,
           }))
           .sort((a, b) => b.score - a.score);
@@ -310,11 +314,13 @@ export default function Result({
                   {scoreItems.map((item) => (
                     <div key={item.code}>
                       <div className="mb-1 flex items-center justify-between text-sm">
-                        <span className={`font-medium ${
-                          item.isResult
-                            ? 'text-indigo-600 dark:text-indigo-400'
-                            : 'text-zinc-600 dark:text-zinc-400'
-                        }`}>
+                        <span
+                          className={`font-medium ${
+                            item.isResult
+                              ? 'text-indigo-600 dark:text-indigo-400'
+                              : 'text-zinc-600 dark:text-zinc-400'
+                          }`}
+                        >
                           {item.title}
                           {item.isResult && ' ✓'}
                         </span>
@@ -353,7 +359,8 @@ export default function Result({
                       {/* 차원 이름 - 모바일에서는 축약형 */}
                       <div className="mb-2 text-center">
                         <span className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 sm:hidden">
-                          {item.dimension.split(' vs ')[0].slice(0, 2)} vs {item.dimension.split(' vs ')[1].slice(0, 2)}
+                          {item.dimension.split(' vs ')[0].slice(0, 2)} vs{' '}
+                          {item.dimension.split(' vs ')[1].slice(0, 2)}
                         </span>
                         <span className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-zinc-400">
                           {item.dimension}
@@ -418,7 +425,8 @@ export default function Result({
                   ))}
                 </div>
                 <p className="mt-4 text-center text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-600 leading-relaxed">
-                  각 차원별로 높은 점수를 받은 성향이 최종 MBTI 유형을 결정합니다
+                  각 차원별로 높은 점수를 받은 성향이 최종 MBTI 유형을
+                  결정합니다
                 </p>
               </div>
             )}
